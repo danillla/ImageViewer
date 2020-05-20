@@ -9,6 +9,13 @@
 import Foundation
 
 public protocol GalleryItemsDelegate: class {
-
+    
     func removeGalleryItem(at index: Int)
+    func shouldRemoveGalleryItem(at index: Int, block: @escaping (Bool) -> Void)
+}
+
+extension GalleryItemsDelegate {
+    func shouldRemoveGalleryItem(at index: Int, block: @escaping (Bool) -> Void) {
+        block(true)
+    }
 }

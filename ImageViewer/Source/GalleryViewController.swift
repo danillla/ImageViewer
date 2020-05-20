@@ -22,6 +22,7 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
     fileprivate var thumbnailsButton: UIButton? = UIButton.thumbnailsButton()
     fileprivate var deleteButton: UIButton? = UIButton.deleteButton()
     fileprivate let scrubber = VideoScrubber()
+    fileprivate let backgroundTopView: UIView = UIView()
 
     fileprivate weak var initialItemController: ItemController?
 
@@ -43,10 +44,10 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
     fileprivate var galleryPagingMode = GalleryPagingMode.standard
     fileprivate var headerLayout = HeaderLayout.center(25)
     fileprivate var footerLayout = FooterLayout.center(25)
-    fileprivate var closeLayout = ButtonLayout.pinRight(8, 16)
+    fileprivate var closeLayout = ButtonLayout.pinLeft(16, 0)
     fileprivate var seeAllCloseLayout = ButtonLayout.pinRight(8, 16)
     fileprivate var thumbnailsLayout = ButtonLayout.pinLeft(8, 16)
-    fileprivate var deleteLayout = ButtonLayout.pinRight(8, 66)
+    fileprivate var deleteLayout = ButtonLayout.pinRight(16, 0)
     fileprivate var statusBarHidden = true
     fileprivate var overlayAccelerationFactor: CGFloat = 1
     fileprivate var rotationDuration = 0.15
@@ -246,6 +247,12 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
         self.view.addSubview(scrubber)
     }
 
+    fileprivate func configureTopBarBackground() {
+        backgroundTopView.alpha = 0
+        backgroundTopView.backgroundColor = UIColor(white: 252.0/255.0, alpha: 1.0)
+        self.view.addSubview(backgroundTopView)
+    }
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -255,6 +262,7 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
             }
         }
 
+        configureTopBarBackground()
         configureHeaderView()
         configureFooterView()
         configureCloseButton()
@@ -318,6 +326,7 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
 
         overlayView.frame = view.bounds.insetBy(dx: -UIScreen.main.bounds.width * 2, dy: -UIScreen.main.bounds.height * 2)
 
+        layoutTopBarBackgroundView()
         layoutButton(closeButton, layout: closeLayout)
         layoutButton(thumbnailsButton, layout: thumbnailsLayout)
         layoutButton(deleteButton, layout: deleteLayout)
@@ -352,6 +361,14 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
             button.frame.origin.x = marginLeft
             button.frame.origin.y = defaultInsets.top + marginTop
         }
+    }
+
+    fileprivate func layoutTopBarBackgroundView() {
+        backgroundTopView.autoresizingMask = [.flexibleBottomMargin, .flexibleWidth]
+        backgroundTopView.bounds.size.width = self.view.bounds.width
+        backgroundTopView.bounds.size.height = 64.0 + defaultInsets.top
+        backgroundTopView.sizeToFit()
+        backgroundTopView.frame.origin = CGPoint(x: 0, y: 0)
     }
 
     fileprivate func layoutHeaderView() {
@@ -424,16 +441,21 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
     }
 
     @objc fileprivate func deleteItem() {
+        
+        itemsDelegate?.shouldRemoveGalleryItem(at: currentIndex) {
+            [weak self] shouldRemove in
+            guard let self = self, shouldRemove else { return }
 
-        deleteButton?.isEnabled = false
-        view.isUserInteractionEnabled = false
+            self.deleteButton?.isEnabled = false
+            self.view.isUserInteractionEnabled = false
 
-        itemsDelegate?.removeGalleryItem(at: currentIndex)
-        removePage(atIndex: currentIndex) {
+            self.itemsDelegate?.removeGalleryItem(at: self.currentIndex)
+            self.removePage(atIndex: self.currentIndex) {
 
-            [weak self] in
-            self?.deleteButton?.isEnabled = true
-            self?.view.isUserInteractionEnabled = true
+                [weak self] in
+                self?.deleteButton?.isEnabled = true
+                self?.view.isUserInteractionEnabled = true
+            }
         }
     }
 
@@ -569,7 +591,8 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
             self?.thumbnailsButton?.alpha = 0.0
             self?.deleteButton?.alpha = 0.0
             self?.scrubber.alpha = 0.0
-
+            self?.backgroundTopView.alpha = 0.0
+            
             }, completion: { [weak self] done in
 
                 if let strongSelf = self,
@@ -612,6 +635,7 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
             self?.closeButton?.alpha = targetAlpha
             self?.thumbnailsButton?.alpha = targetAlpha
             self?.deleteButton?.alpha = targetAlpha
+            self?.backgroundTopView.alpha = targetAlpha
 
             if let _ = self?.viewControllers?.first as? VideoViewController {
 
@@ -697,7 +721,8 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
             deleteButton?.alpha = alpha
             headerView?.alpha = alpha
             footerView?.alpha = alpha
-
+            backgroundTopView.alpha = alpha
+            
             if controller is VideoViewController {
                 scrubber.alpha = alpha
             }

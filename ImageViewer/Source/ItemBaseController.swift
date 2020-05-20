@@ -130,6 +130,7 @@ open class ItemBaseController<T: UIView>: UIViewController, ItemController, UIGe
         scrollView.showsVerticalScrollIndicator = false
         scrollView.decelerationRate = UIScrollView.DecelerationRate.fast
         scrollView.contentInset = UIEdgeInsets.zero
+        scrollView.clipsToBounds = false
         scrollView.contentOffset = CGPoint.zero
         scrollView.minimumZoomScale = minimumZoomScale
         scrollView.maximumZoomScale = max(maximumZoomScale, aspectFillZoomScale(forBoundingSize: self.view.bounds.size, contentSize: itemView.bounds.size))
@@ -235,10 +236,18 @@ open class ItemBaseController<T: UIView>: UIViewController, ItemController, UIGe
         self.delegate?.itemControllerWillDisappear(self)
     }
 
+    private var defaultInsets: UIEdgeInsets {
+        if #available(iOS 11.0, *) {
+            return view.safeAreaInsets
+        } else {
+            return UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+        }
+    }
+
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        scrollView.frame = self.view.bounds
+        scrollView.frame = CGRect(x: 0.0, y: 64.0 + defaultInsets.top, width: self.view.bounds.width, height: self.view.bounds.height - 64.0 - defaultInsets.top)
         activityIndicatorView.center = view.boundsCenter
 
         if let size = itemView.image?.size , size != CGSize.zero {
@@ -275,9 +284,9 @@ open class ItemBaseController<T: UIView>: UIViewController, ItemController, UIGe
     }
 
     @objc func scrollViewDidDoubleTap(_ recognizer: UITapGestureRecognizer) {
-
+        
         let touchPoint = recognizer.location(ofTouch: 0, in: itemView)
-        let aspectFillScale = aspectFillZoomScale(forBoundingSize: scrollView.bounds.size, contentSize: itemView.bounds.size)
+        let aspectFillScale = itemView.image!.size.width / scrollView.bounds.size.width
 
         if (scrollView.zoomScale == 1.0 || scrollView.zoomScale > aspectFillScale) {
 

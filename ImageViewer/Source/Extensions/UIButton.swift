@@ -91,10 +91,9 @@ extension UIButton {
     }
 
     static func closeButton() -> UIButton {
-
         let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 50, height: 50)))
-        button.setImage(CAShapeLayer.closeShape(edgeLength: 15).toImage(), for: .normal)
-
+        button.setImage(UIImage(named: "BackIcon"), for: .normal)
+        button.tintColor = UIColor(red: 1.0/255.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1)
         return button
     }
 
@@ -102,16 +101,14 @@ extension UIButton {
 
         let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 80, height: 50)))
         button.setTitle("See All", for: .normal)
-        //button.titleLabel?.textColor = UIColor.redColor()
 
         return button
     }
 
     static func deleteButton() -> UIButton {
-
-        let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 80, height: 50)))
-        button.setTitle("Delete", for: .normal)
-
+        let button = UIButton(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: 50, height: 50)))
+        button.setImage(UIImage(named: "AttachmentDeleteIcon"), for: .normal)
+        button.tintColor = UIColor(red: 1.0/255.0, green: 122.0/255.0, blue: 255.0/255.0, alpha: 1)
         return button
     }
 }
