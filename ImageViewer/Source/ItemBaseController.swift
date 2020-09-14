@@ -247,7 +247,7 @@ open class ItemBaseController<T: UIView>: UIViewController, ItemController, UIGe
     override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        scrollView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.bounds.width, height: self.view.bounds.height)
+        scrollView.frame = CGRect(x: 0.0, y: defaultInsets.top + 14.0, width: self.view.bounds.width, height: self.view.bounds.height - defaultInsets.top - 14.0)
         activityIndicatorView.center = view.boundsCenter
 
         if let size = itemView.image?.size , size != CGSize.zero {
