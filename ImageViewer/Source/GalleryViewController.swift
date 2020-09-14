@@ -440,7 +440,7 @@ open class GalleryViewController: UIPageViewController, ItemControllerDelegate {
         scrubber.frame.origin.y = (footerView?.frame.origin.y ?? self.view.bounds.maxY) - scrubber.bounds.height
     }
 
-    @objc fileprivate func deleteItem() {
+    @objc open func deleteItem() {
         
         itemsDelegate?.shouldRemoveGalleryItem(at: currentIndex) {
             [weak self] shouldRemove in
